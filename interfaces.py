@@ -1,17 +1,13 @@
 from abc import ABC, abstractmethod
-from parser import Parser
-parser = Parser()
-
 
 class IParser(ABC):
     @abstractmethod
     def text_to_json(self, text: str) -> dict:
-        return Parser.question_json(text)
+        pass
 
     @abstractmethod
     def json_to_text(self, data: dict) -> str:
-        return Parser.json_to_text(data)
-
+        pass
 
 class IHistory(ABC):
     @abstractmethod
@@ -25,7 +21,6 @@ class IHistory(ABC):
     @abstractmethod
     def delete_history(self) -> None:
         pass
-
 
 class IApi(ABC):
     @abstractmethod

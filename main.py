@@ -1,9 +1,14 @@
+import os
+import time
+from abc import ABC, abstractmethod
+from dotenv import load_dotenv
 from core import Core
-from parser import Parser
-from database import JsonHistory
-from api import TogetherApi
+from services.parser import Parser
+from services.database import JsonHistory
+from services.api import TogetherApi
 
-API_KEY = "API"
+settings = load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 def main():
     parser = Parser()

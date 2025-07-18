@@ -26,3 +26,12 @@ class ApiManager(ABC):
     @abstractmethod
     def send_query(self, data: dict) -> dict:
         pass
+
+class SettingsService(ABC):
+    @abstractmethod
+    def change_settings() -> None:
+        pass
+    
+    @abstractmethod
+    def get_settings() -> dict:
+        pass

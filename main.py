@@ -1,6 +1,4 @@
 import os
-import time
-from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from core import Core
 from services.parser import Parser
@@ -8,12 +6,11 @@ from services.database import JsonHistory
 from services.api import TogetherApi
 
 settings = load_dotenv()
-API_KEY = os.getenv("API_KEY")
 
 def main():
     parser = Parser()
-    history = JsonHistory(file_path="history.json")
-    api = TogetherApi(api_key=API_KEY)
+    history = JsonHistory(file_path="resources/history.json")
+    api = TogetherApi()
     core = Core(parser, history, api)
     try:    
         while True:

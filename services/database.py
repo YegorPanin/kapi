@@ -2,7 +2,7 @@ import json
 from interfaces import HistoryManager
 
 class JsonHistory(HistoryManager):
-    def __init__(self, file_path="history.json"):
+    def __init__(self, file_path="resources/history.json"):
         self.file_path = file_path
         try:
             with open(self.file_path, "r") as f:

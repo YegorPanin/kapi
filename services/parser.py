@@ -14,7 +14,7 @@ class Parser(ParseManager):
         return cleaned_content
 
     def extract_bash(self, text: str) -> str:
-        match = re.search(r"<bash>(.*?)</bash>", text, re.DOTALL)
+        match = re.search(r'```bash\s*(.*?)\s*```', text, re.DOTALL)
         if match:
             return match.group(1).strip()
         return ""

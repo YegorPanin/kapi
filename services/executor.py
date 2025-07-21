@@ -15,6 +15,7 @@ class BashExecutor(ExecutorService):
                 check=True
             )
             output = result.stdout
+            print(output)
             return output
 
         except subprocess.CalledProcessError as e:

@@ -20,7 +20,8 @@ class Core:
             
             # Извлечение и исполнение bash
             bash_code = self.parser.extract_bash(answer)
-            result = self.executor.execute_bash(bash_code)
+            result = "Проанализируй результат выполнения:" + self.executor.execute_bash(bash_code)
+            print(result)
 
             # Анализ результата исполнения 
             question_json = self.parser.text_to_json(result)

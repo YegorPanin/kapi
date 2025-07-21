@@ -84,6 +84,10 @@ class ChatApp(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        # Загрузка стилей
+        with open("styles.qss", "r") as f:
+            self.setStyleSheet(f.read())
+
         layout = QVBoxLayout()
 
         # Область вывода диалога
@@ -97,6 +101,7 @@ class ChatApp(QWidget):
 
         # Кнопка отправки
         send_button = QPushButton("Отправить")
+        send_button.setObjectName("send_button")
         send_button.clicked.connect(self.handle_send)
 
         input_layout.addWidget(self.input_line)
@@ -105,6 +110,7 @@ class ChatApp(QWidget):
         # Строка с кнопкой настроек
         settings_layout = QHBoxLayout()
         settings_button = QPushButton("...")
+        settings_button.setObjectName("settings_button")
         settings_button.setFixedWidth(30)
         settings_button.clicked.connect(self.open_settings)
         settings_layout.addStretch()

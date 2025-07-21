@@ -1,0 +1,118 @@
+/* Основные настройки */
+QWidget {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    selection-background-color: #00bcd4;
+    selection-color: white;
+}
+
+/* Эффект стекла для главного окна */
+ChatApp {
+    background-color: rgba(45, 45, 45, 0.85);
+    border-radius: 12px;
+    border: 1px solid #3a3a3a;
+}
+
+/* Текстовые поля */
+QTextEdit, QLineEdit {
+    background-color: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 8px;
+    padding: 8px;
+    color: #e0e0e0;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+QTextEdit {
+    background-color: #252525;
+}
+
+/* Кнопки */
+QPushButton {
+    background-color: #3a3a3a;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #e0e0e0;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    background-color: #4a4a4a;
+}
+
+QPushButton:pressed {
+    background-color: #2a2a2a;
+}
+
+/* Специальные кнопки */
+QPushButton#send_button {
+    background-color: #00838f;
+    color: white;
+}
+
+QPushButton#send_button:hover {
+    background-color: #00bcd4;
+}
+
+QPushButton#settings_button {
+    background-color: transparent;
+    color: #00bcd4;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Диалоговые окна */
+QDialog {
+    background-color: #2d2d2d;
+    border-radius: 12px;
+}
+
+/* Формы */
+QFormLayout {
+    margin: 15px;
+}
+
+/* Выпадающие списки */
+QComboBox {
+    background-color: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 8px;
+    padding: 5px;
+    color: #e0e0e0;
+    min-width: 120px;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left-width: 1px;
+    border-left-color: #4a4a4a;
+    border-left-style: solid;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+/* Полоса прокрутки */
+QScrollBar:vertical {
+    border: none;
+    background: #3a3a3a;
+    width: 10px;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #4a4a4a;
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}

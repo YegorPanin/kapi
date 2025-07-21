@@ -1,19 +1,78 @@
 import os
 from dotenv import load_dotenv
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton, QLabel, QDialog, QFormLayout, QComboBox, QMessageBox
 from PySide6.QtCore import Qt
 from core import Core
 from services.parser import Parser
 from services.database import JsonHistory
 from services.api import TogetherApi
+from services.settings import Settings
+from interfaces import SettingsService
 
 # Загрузка переменных окружения
 load_dotenv()
 
+class SettingsWindow(QDialog):
+    def __init__(self, settings_service, parent=None):
+        super().__init__(parent)
+        self.settings_service = settings_service
+        self.setWindowTitle("Настройки")
+        self.layout = QFormLayout(self)
+
+        self.settings_fields = {}
+
+        # Получаем текущие настройки
+        self.current_settings = self.settings_service.get_settings()
+
+        # Создаём поля ввода для каждой настройки
+        for key, value in self.current_settings.items():
+            if key == "system_prompt":
+                text_edit = QTextEdit()
+                text_edit.setPlainText(str(value))
+                self.layout.addRow(QLabel(key), text_edit)
+                self.settings_fields[key] = text_edit
+            elif isinstance(value, str):
+                line_edit = QLineEdit(value)
+                self.layout.addRow(QLabel(key), line_edit)
+                self.settings_fields[key] = line_edit
+            elif isinstance(value, bool):
+                combo = QComboBox()
+                combo.addItems(["True", "False"])
+                combo.setCurrentText(str(value))
+                self.layout.addRow(QLabel(key), combo)
+                self.settings_fields[key] = combo
+            else:
+                line_edit = QLineEdit(str(value))
+                self.layout.addRow(QLabel(key), line_edit)
+                self.settings_fields[key] = line_edit
+
+        # Кнопки
+        self.save_button = QPushButton("Сохранить")
+        self.save_button.clicked.connect(self.save_settings)
+        self.layout.addWidget(self.save_button)
+
+    def save_settings(self):
+        updated_settings = {}
+        for key, widget in self.settings_fields.items():
+            if isinstance(widget, QLineEdit):
+                updated_settings[key] = widget.text()
+            elif isinstance(widget, QTextEdit):
+                updated_settings[key] = widget.toPlainText()
+            elif isinstance(widget, QComboBox):
+                updated_settings[key] = widget.currentText() == "True"
+
+        try:
+            self.settings_service.change_settings(updated_settings)
+            QMessageBox.information(self, "Настройки", "Настройки успешно сохранены. Перезапустите приложение для применения изменений.")
+            self.accept()
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить настройки: {e}")
+
 class ChatApp(QWidget):
-    def __init__(self, core):
+    def __init__(self, core, settings_service):
         super().__init__()
         self.core = core
+        self.settings_service = settings_service
         self.setWindowTitle("Kapi - Чат-бот")
         self.setGeometry(100, 100, 600, 400)
 
@@ -38,8 +97,17 @@ class ChatApp(QWidget):
         input_layout.addWidget(self.input_line)
         input_layout.addWidget(send_button)
 
+        # Строка с кнопкой настроек (гамбургер-меню)
+        settings_layout = QHBoxLayout()
+        settings_button = QPushButton("☰")
+        settings_button.setFixedWidth(30)
+        settings_button.clicked.connect(self.open_settings)
+        settings_layout.addStretch()
+        settings_layout.addWidget(settings_button)
+
         layout.addWidget(self.chat_area)
         layout.addLayout(input_layout)
+        layout.addLayout(settings_layout)
 
         self.setLayout(layout)
 
@@ -60,12 +128,15 @@ class ChatApp(QWidget):
         except Exception as e:
             self.chat_area.append(f"Kapi: Ошибка: {str(e)}")
 
+    def open_settings(self):
+        dialog = SettingsWindow(self.settings_service, self)
+        dialog.exec()
+
     def closeEvent(self, event):
         """Очистка истории при закрытии окна"""
         self.core.history.delete_history()
         print("История очищена.")
         event.accept()
-
 
 def main():
     # Инициализация приложения
@@ -77,12 +148,14 @@ def main():
     api = TogetherApi()
     core = Core(parser, history, api)
 
+    # Инициализация сервиса настроек
+    settings_service = Settings()
+
     # Запуск GUI
-    window = ChatApp(core)
+    window = ChatApp(core, settings_service)
     window.show()
 
     app.exec()
-
 
 if __name__ == "__main__":
     main()

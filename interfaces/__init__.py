@@ -9,6 +9,10 @@ class ParseManager(ABC):
     def json_to_text(self, data: dict) -> str:
         pass
 
+    @abstractmethod
+    def extract_bash(self, text: str) -> str:
+        pass
+
 class HistoryManager(ABC):
     @abstractmethod
     def get_history(self) -> list:
@@ -29,9 +33,14 @@ class ApiManager(ABC):
 
 class SettingsService(ABC):
     @abstractmethod
-    def change_settings() -> None:
+    def change_settings(self, options: dict) -> None:
         pass
     
     @abstractmethod
     def get_settings() -> dict:
+        pass
+
+class ExecutorService(ABC):
+    @abstractmethod
+    def execute_bash(self, script: str) -> str:
         pass

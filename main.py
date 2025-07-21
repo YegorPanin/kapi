@@ -8,6 +8,7 @@ from services.database import JsonHistory
 from services.api import TogetherApi
 from services.settings import Settings
 from interfaces import SettingsService
+from services.executor import BashExecutor
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -26,12 +27,7 @@ class SettingsWindow(QDialog):
 
         # Создаём поля ввода для каждой настройки
         for key, value in self.current_settings.items():
-            if key == "system_prompt":
-                text_edit = QTextEdit()
-                text_edit.setPlainText(str(value))
-                self.layout.addRow(QLabel(key), text_edit)
-                self.settings_fields[key] = text_edit
-            elif isinstance(value, str):
+            if isinstance(value, str):
                 line_edit = QLineEdit(value)
                 self.layout.addRow(QLabel(key), line_edit)
                 self.settings_fields[key] = line_edit
@@ -55,18 +51,27 @@ class SettingsWindow(QDialog):
         updated_settings = {}
         for key, widget in self.settings_fields.items():
             if isinstance(widget, QLineEdit):
-                updated_settings[key] = widget.text()
-            elif isinstance(widget, QTextEdit):
-                updated_settings[key] = widget.toPlainText()
+                val = widget.text()
+                # Попытка привести к типу оригинального значения
+                orig_val = self.current_settings[key]
+                if isinstance(orig_val, bool):
+                    updated_settings[key] = val.lower() in ('true', '1', 't', 'y', 'yes')
+                elif isinstance(orig_val, int):
+                    updated_settings[key] = int(val)
+                elif isinstance(orig_val, float):
+                    updated_settings[key] = float(val)
+                else:
+                    updated_settings[key] = val
             elif isinstance(widget, QComboBox):
                 updated_settings[key] = widget.currentText() == "True"
 
         try:
             self.settings_service.change_settings(updated_settings)
-            QMessageBox.information(self, "Настройки", "Настройки успешно сохранены. Перезапустите приложение для применения изменений.")
+            QMessageBox.information(self, "Настройки", "Настройки успешно сохранены.")
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Ошибка", f"Не удалось сохранить настройки: {e}")
+
 
 class ChatApp(QWidget):
     def __init__(self, core, settings_service):
@@ -97,9 +102,9 @@ class ChatApp(QWidget):
         input_layout.addWidget(self.input_line)
         input_layout.addWidget(send_button)
 
-        # Строка с кнопкой настроек (гамбургер-меню)
+        # Строка с кнопкой настроек
         settings_layout = QHBoxLayout()
-        settings_button = QPushButton("☰")
+        settings_button = QPushButton("...")
         settings_button.setFixedWidth(30)
         settings_button.clicked.connect(self.open_settings)
         settings_layout.addStretch()
@@ -138,6 +143,7 @@ class ChatApp(QWidget):
         print("История очищена.")
         event.accept()
 
+
 def main():
     # Инициализация приложения
     app = QApplication([])
@@ -146,7 +152,8 @@ def main():
     parser = Parser()
     history = JsonHistory(file_path="resources/history.json")
     api = TogetherApi()
-    core = Core(parser, history, api)
+    executor = BashExecutor()
+    core = Core(parser, history, api, executor)
 
     # Инициализация сервиса настроек
     settings_service = Settings()
@@ -156,6 +163,7 @@ def main():
     window.show()
 
     app.exec()
+
 
 if __name__ == "__main__":
     main()
